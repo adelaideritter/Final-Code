@@ -1,0 +1,206 @@
+<html>
+<head>
+<title>SHAPE RAVE!</title>
+<p id='para'>Click anywhere on the canvas to get the rave going! The more you click, the bigger the party! -></p>
+<audio autoplay>
+  <source src="Music.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio> <!--the HTML5 audio feature supports most browsers for mp3, but it works best with Chrome!-->
+<style>
+p {
+	color: red;
+	text-align: left;
+	font-size: 20px;
+	font-family: Verdana;
+	border-style: dotted;
+	border-color: purple;
+	border-width: medium;
+}
+</style>
+<script>
+	  var canvas;
+	  var context;
+	  var text = 0;
+	  var circles = [];
+	  var rectangles = [];
+	  var stars = [];
+	  var hexagons = [];
+	  var octagons = [];
+	  function Circle(x, y, color){
+		this.x = x;
+		this.y = y;
+		this.color = color;
+		this.dx = Math.random()*3; //random location
+		this.dy = Math.random()*3;
+	  }
+	  function Rectangle(x, y, color){
+	  	this.x = x;
+	  	this.y = y;
+	  	this.color = color;
+	  	this.ex = Math.random()*3; //random location
+	  	this.ey = Math.random()*3;
+	  }
+	  function Star(x, y, color){
+	  	this.x = x;
+	  	this.y = y;
+	  	this.color = color;
+	  	this.gx = Math.random()*3; //random location
+		this.gy = Math.random()*3;
+	  }
+	  function Hexagon(x, y, color){
+	  	this.x = x;
+	  	this.y = y;
+	  	this.color = color;
+	  	this.qx = Math.random()*3; //random location
+		this.qy = Math.random()*3;
+	  }
+	  function Octagon(x, y, color){
+	  	this.x = x;
+	  	this.y = y;
+	  	this.color = color;
+	  	this.nx = Math.random()*3; //random location
+		this.ny = Math.random()*3;
+	  }
+      function init() {
+        canvas = document.getElementById('canvas');
+        context = canvas.getContext("2d");
+        window.addEventListener('resize', resizeCanvas, false);
+        window.addEventListener('orientationchange', resizeCanvas, false);
+        resizeCanvas();
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		};
+		setInterval(resizeCanvas, Math.floor(Math.random() * 100)); //random speed
+      }
+	  function handleClick(x, y) {
+	  	 var number;
+	     var found = false;
+		 fillBackgroundColor();
+		 if (!found) {
+		 	var number = text += 1;
+			var colors = ["red", "green", "blue", "orange", "purple", "yellow"];
+			var color = colors[Math.floor(Math.random()*colors.length)];
+			circles.push(new Circle(x, y, color));
+			rectangles.push(new Rectangle(x, y, color));
+			stars.push(new Star(x, y, color));
+			hexagons.push(new Hexagon(x, y, color));
+			octagons.push(new Octagon(x, y, color));
+		} //random colors
+		for (var i=0; i<circles.length; i++) {
+			drawCircle(circles[i]);
+		}
+		for (var i=0; i<rectangles.length; i++) {
+			drawRectangle(rectangles[i]);
+		}
+		for (var i=0; i<circles.length; i++) {
+			drawStar(stars[i]);
+		}
+		for (var i=0; i<circles.length; i++) {
+			drawOctagon(octagons[i]);
+		}
+		for (var i=0; i<circles.length; i++) {
+			drawHexagon(hexagons[i]);
+		};
+		console.log(number);
+		if(number > 1 && number <= 5) //changes state of the party
+			document.getElementById('para').innerHTML = "The party is just getting started! Keep clicking!";
+		else if(number > 5 && number <= 20)
+			document.getElementById('para').innerHTML = "Now it's a party!";
+		else if(number > 20)
+			document.getElementById('para').innerHTML = "Woah, getting a little crazy!";
+	  }
+	  function drawCircle(circle) {
+		var radius = Math.floor(Math.random() * 40); //random size
+		var x = Math.floor(Math.random() * canvas.width);
+		var y = Math.floor(Math.random() * canvas.height);
+		context.beginPath();
+		context.arc(x, y, radius, 0, degreesToRadians(360), true);
+		context.fillStyle = circle.color;
+		context.fill();
+	  }
+	  function drawRectangle(rectangle) {
+		var x = Math.floor(Math.random() * canvas.width);
+		var y = Math.floor(Math.random() * canvas.height);
+		var w = Math.floor(Math.random() * 40); //random size
+		context.beginPath();
+		context.rect(x, y, w, w);
+		context.fillStyle = rectangle.color;
+		context.fill();
+	  }
+	  function drawStar(star) {
+	  	var alpha = (2 * Math.PI) / 10; 
+		var radius = Math.floor(Math.random() * 40); //random size
+		var starXY = [Math.floor(Math.random() * canvas.width),Math.floor(Math.random() * canvas.height)]
+		context.beginPath();
+		for(var i = 11; i != 0; i--){
+    		var r = radius*(i % 2 + 1)/2;
+    		var omega = alpha * i;
+    		context.lineTo((r * Math.sin(omega)) + starXY[0], (r * Math.cos(omega)) + starXY[1]);
+		}
+		//equations implemented from stackoverflow forums
+		context.closePath();
+		context.fillStyle = star.color;
+		context.fill();
+	  }
+	  function drawHexagon(hexagon) {
+    	size = 30;
+    	Xcenter = Math.floor(Math.random() * canvas.width);;
+    	Ycenter = Math.floor(Math.random() * canvas.width);;
+		context.beginPath();
+		context.moveTo (Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));          
+		for (var i = 1; i <= 6; i += 1) {
+    		context.lineTo (Xcenter + size * Math.cos(i * 2 * Math.PI / 6), Ycenter + size * Math.sin(i * 2 * Math.PI / 6));
+		context.fillStyle = hexagon.color;
+		context.fill();
+  	    }
+  	  }
+  	  function drawOctagon(octagon) {
+    	size = 20;
+    	Xcenter = Math.floor(Math.random() * canvas.width);;
+    	Ycenter = Math.floor(Math.random() * canvas.width);;
+		context.beginPath();
+		context.moveTo (Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));          
+		for (var i = 1; i <= 8; i += 1) {
+    		context.lineTo (Xcenter + size * Math.cos(i * 2 * Math.PI / 8), Ycenter + size * Math.sin(i * 2 * Math.PI / 8));
+		context.fillStyle = octagon.color;
+		context.fill();
+  	    }
+  	  }
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+		fillBackgroundColor();
+		for (var i=0; i<circles.length; i++) {
+			drawCircle(circles[i]);
+		 }
+		for (var i=0; i<rectangles.length; i++) {
+			drawRectangle(rectangles[i]);
+		 }
+		for (var i=0; i<stars.length; i++) {
+			drawStar(stars[i]);
+		 }
+		for (var i=0; i<hexagons.length; i++) {
+			drawHexagon(hexagons[i]);
+		 }
+		for (var i=0; i<octagons.length; i++) {
+			drawOctagon(octagons[i]);
+		 }
+		context.font = "100px Arial";
+	  	context.fillText("PARTY!",100,150);
+      }
+	  function fillBackgroundColor() {
+		 var colors = ["red", "green", "blue", "orange", "purple", "yellow"];
+		 var bgColor = colors[Math.floor(Math.random() * colors.length)];
+		 //random background colors 'flashing' on click
+		 context.fillRect(0, 0, canvas.width, canvas.height);
+	}
+	function degreesToRadians(degrees) {
+		return (degrees * Math.PI)/180;
+	}
+
+	window.onload = init;
+</script>
+</head>
+<body>
+<canvas id="canvas" width=500 height=500></canvas>
+</body></html>
